@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Special Surprise For You</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Cormorant+Garamond:ital,wght@1,300;1,600&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  min-height: 100vh;
+  background: #fdf6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+  padding: 20px;
+}
+
+#app {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: blob-float 10s ease-in-out infinite;
+  z-index: 0;
+}
+.b1 { width:340px;height:340px;background:#e9d5ff;top:-80px;left:-80px;opacity:0.7;animation-delay:0s; }
+.b2 { width:280px;height:280px;background:#fbcfe8;bottom:-60px;right:-60px;opacity:0.6;animation-delay:-4s; }
+.b3 { width:200px;height:200px;background:#bfdbfe;top:45%;left:55%;opacity:0.5;animation-delay:-7s; }
+.b4 { width:150px;height:150px;background:#fde68a;top:15%;right:5%;opacity:0.4;animation-delay:-2s; }
+
+@keyframes blob-float {
+  0%,100%{transform:translate(0,0) scale(1);}
+  40%{transform:translate(15px,-20px) scale(1.04);}
+  70%{transform:translate(-10px,12px) scale(0.97);}
+}
+
+.petal {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50% 0;
+  z-index: 1;
+  opacity: 0;
+  animation: petal-fall linear infinite;
+}
+@keyframes petal-fall {
+  0%   { transform: translateY(-20px) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+#intro {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: #fdf6ff;
+}
+
+.intro-ring {
+  position: relative;
+  width: 120px; height: 120px;
+  margin-bottom: 28px;
+}
+.intro-ring svg {
+  position: absolute;
+  inset: 0;
+  animation: spin 5s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.intro-emoji {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  animation: cake-pulse 2s ease-in-out infinite;
+}
+@keyframes cake-pulse {
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.12);}
+}
+
+.intro-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: #4c1d95;
+  letter-spacing: -0.5px;
+  text-align: center;
+  opacity: 0;
+  animation: rise 0.8s 0.4s ease forwards;
+}
+.intro-sub {
+  font-size: 15px;
+  color: #9d77c7;
+  margin-top: 8px;
+  text-align: center;
+  opacity: 0;
+  animation: rise 0.8s 0.7s ease forwards;
+}
+.intro-dots {
+  display: flex;
+  gap: 9px;
+  margin-top: 34px;
+  opacity: 0;
+  animation: rise 0.8s 1s ease forwards;
+}
+.intro-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #c084fc;
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+.intro-dot:nth-child(2){ animation-delay:0.2s; background:#f9a8d4; }
+.intro-dot:nth-child(3){ animation-delay:0.4s; background:#93c5fd; }
+
+@keyframes dot-bounce {
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-9px);}
+}
+@keyframes rise {
+  from{opacity:0;transform:translateY(14px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+#intro.out {
+  animation: intro-out 0.6s ease forwards;
+}
+@keyframes intro-out {
+  to{opacity:0;transform:scale(1.04);pointer-events:none;}
+}
+
+#mainPanel {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  display: none;
+}
+#mainPanel.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card {
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(255,255,255,0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 28px;
+  padding: 38px 34px;
+  box-shadow: 0 8px 40px rgba(139,92,246,0.1), 0 2px 8px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2.5px;
+  background: linear-gradient(90deg,#c084fc,#f9a8d4,#93c5fd,#fde68a,#c084fc);
+  background-size: 300% 100%;
+  animation: shimmer 4s linear infinite;
+}
+@keyframes shimmer { to{background-position:300% 0;} }
+
+#step1 { text-align: center; }
+
+.s1-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg,#f3e8ff,#fce7f3);
+  border: 1px solid #e9d5ff;
+  border-radius: 100px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7c3aed;
+  letter-spacing: 0.5px;
+  margin-bottom: 22px;
+}
+.s1-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.s1-sub {
+  font-size: 14px;
+  color: #9d77c7;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.name-input {
+  width: 100%;
+  background: #faf5ff;
+  border: 1.5px solid #e9d5ff;
+  border-radius: 16px;
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e1b4b;
+  text-align: center;
+  outline: none;
+  font-family: inherit;
+  margin-bottom: 14px;
+  transition: all 0.3s;
+}
+.name-input::placeholder { color: #c4b5fd; font-weight: 400; }
+.name-input:focus {
+  border-color: #a855f7;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(168,85,247,0.1);
+}
+
+.btn-open {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+  box-shadow: 0 6px 22px rgba(168,85,247,0.35);
+}
+.btn-open:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(168,85,247,0.45); }
+.btn-open:active { transform:scale(0.97); }
+
+#step2 { display: none; }
+
+.s2-for {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c084fc;
+  margin-bottom: 4px;
+}
+.s2-name {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg,#7c3aed,#db2777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.photo-wrap {
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg,#f3e8ff,#fce7f3);
+  margin-bottom: 18px;
+  border: 1px solid #e9d5ff;
+}
+.photo-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.35s ease;
+}
+.photo-arrows {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  transform: translateY(-50%);
+}
+.arr-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(168,85,247,0.2);
+  color: #7c3aed;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.arr-btn:hover { background: rgba(255,255,255,1); }
+
+.pdots {
+  position: absolute;
+  bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+.pdot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.pdot.active { background: #7c3aed; width: 18px; border-radius: 3px; }
+
+.msg-box {
+  background: linear-gradient(135deg,#faf5ff,#fdf2f8);
+  border: 1px solid #f0e0ff;
+  border-radius: 20px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.msg-quote {
+  font-size: 52px;
+  line-height: 1;
+  color: #ead5ff;
+  font-family: Georgia, serif;
+  position: absolute;
+  top: 8px; left: 16px;
+}
+.msg-text {
+  font-size: 14.5px;
+  color: #4c1d95;
+  line-height: 1.85;
+  padding-top: 16px;
+  font-style: italic;
+}
+
+.lock-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #c4b5fd;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.confetti-piece {
+  position: fixed;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 999;
+  animation: cfetti linear forwards;
+}
+@keyframes cfetti {
+  0%  { transform:translateY(-10px) rotate(0deg);   opacity:1; }
+  100%{ transform:translateY(110vh) rotate(540deg); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+<div class="blob b4"></div>
+
+<div id="intro">
+  <div class="intro-ring">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="54" stroke="#e9d5ff" stroke-width="2"/>
+      <circle cx="60" cy="60" r="54"
+        stroke="url(#rg)" stroke-width="3"
+        stroke-dasharray="90 250"
+        stroke-linecap="round"/>
+      <defs>
+        <linearGradient id="rg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#a855f7"/>
+          <stop offset="1" stop-color="#ec4899"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="intro-emoji">🎂</div>
+  </div>
+  <div class="intro-title">You've got a surprise!</div>
+  <div class="intro-sub">Something sweet is waiting for you…</div>
+  <div class="intro-dots">
+    <div class="intro-dot"></div>
+    <div class="intro-dot"></div>
+    <div class="intro-dot"></div>
+  </div>
+</div>
+
+<div id="app">
+  <div id="mainPanel">
+    <div class="card">
+
+      <div id="step1">
+        <div class="s1-badge">💌 &nbsp;Personal message inside</div>
+        <h1 class="s1-title">A thank you just for you</h1>
+        <p class="s1-sub">Type your name below to unlock your personal note.</p>
+        <input class="name-input" id="nameInput" placeholder="Enter your name…" autocomplete="off"/>
+        <button class="btn-open" onclick="revealMessage()">Open my message ✨</button>
+      </div>
+
+      <div id="step2">
+        <p class="s2-for">A special thank you for</p>
+        <h2 class="s2-name" id="displayName"></h2>
+
+        <div class="photo-wrap" id="photoWrap">
+          <img id="mainPhoto" src="" alt="Memory" onerror="this.style.opacity='0.15'"/>
+          <div class="photo-arrows">
+            <button class="arr-btn" onclick="changeSlide(-1)">‹</button>
+            <button class="arr-btn" onclick="changeSlide(1)">›</button>
+          </div>
+          <div class="pdots" id="pdots"></div>
+        </div>
+
+        <div class="msg-box">
+          <div class="msg-quote">❝</div>
+          <p class="msg-text" id="displayMessage"></p>
+        </div>
+
+        <div class="lock-row">🔒 private · just for you</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  //  FRIEND DATABASE — Add / edit your friends here
+  //  IMPORTANT: keys MUST be lowercase (the code lowercases
+  //  whatever the visitor types before checking this list)
+  // ============================================================
+  const friendDatabase = {
+    "selu": {
+      name: "Selu",
+      photos: ["Public/Selu/IMG_2255.jpeg", "Public/Selu/IMG_7435.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "keyur": {
+      name: "Keyur",
+      photos: ["Public/Keyur/IMG_3101.jpeg", "Public/Keyur/IMG_2179.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "mansi": {
+      name: "Mansi",
+      photos: ["Public/Mansi/9d18c50b-049f-4ae6-919f-3718455acb4d.jpeg", "Public/Mansi/IMG_5331.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "riddhi": {
+      name: "Riddhi",
+      photos: ["Public/Riddhi/IMG_4206.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "saya": {
+      name: "Saya",
+      photos: ["Public/Saya/IMG_4206.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "jiya": {
+      name: "Jiya",
+      photos: ["Public/Jiya/IMG_4199.jpeg", "Public/Jiya/IMG_5250.jpeg", "Public/Jiya/IMG_5298.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "vishwa": {
+      name: "Vishwa",
+      photos: ["Public/Vishwa/IMG_2025.jpeg", "Public/Vishwa/IMG_3110.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "meet": {
+      name: "Meet",
+      photos: ["Public/Meet/IMG_3085.jpeg", "Public/Meet/IMG_3600.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "bhavik": {
+      name: "Bhavik",
+      photos: ["Public/Bhavik/IMG_3595.jpeg"],
+      message: "Thank you for remembering my birthday and taking the time to wish me. It genuinely felt nice hearing from you.I may not say this much , but I really value our friendship. Thanks for always being the way you are. Stay the same, and take care. Much love. ❤️"
+    },
+    "nir": {
+      name: "Nir",
+      photos: ["Public/Nir/IMG_3595.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "priyanka": {
+      name: "Priyanka",
+      photos: ["Public/Priyanka/IMG_2252.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "harsh": {
+      name: "Harsh",
+      photos: ["Public/Harsh/IMG_2252.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "prutha": {
+      name: "Prutha",
+      photos: ["Public/Prutha/IMG_5453.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "dikshita": {
+      name: "Dikshita",
+      photos: ["Public/Dikshita/IMG_5453.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "amit masa": {
+      name: "Amit masa",
+      photos: ["Public/Pruthvi/IMG_1090.jpeg", "Public/Pruthvi/IMG_1123.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "bhanu maa": {
+      name: "Bhanu maa",
+      photos: ["Public/IMG_1482.jpeg", "Public/IMG_2772.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "pratik bhai": {
+      name: "Pratik bhai",
+      photos: ["Public/IMG_5695.jpeg", "Public/IMG_5697.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    },
+    "neil": {
+      name: "Neil",
+      photos: ["Public/IMG_5696.jpeg"],
+      message: "Thank you so much for remembering my birthday and for taking the time to wish me. Your message genuinely made my day a little brighter.I don't always put these things into words, but I'm really grateful for the bond we share. Thank you for standing by me, for the laughs, the support, and for being one of those people I know I can count on. People like you make life's journey a little easier.I hope life gives you every bit of happiness and success you deserve. Stay exactly the way you are. Much love. ❤️"
+    }
+
+    // ── HOW TO ADD A NEW FRIEND ──
+    // Copy the block below, paste above this comment, and fill in the details:
+    //
+    // "friendname": {            <-- always lowercase
+    //   name: "Display Name",    <-- can be capitalized, this is what shows on screen
+    //   photos: ["Public/FolderName/photo1.jpeg", "Public/FolderName/photo2.jpeg"],
+    //   message: "Your personal message here."
+    // },
+  };
+
+  const COMMON = {
+    photos: ["Public/ChatGPT Image Mar 18, 2026, 11_28_24 PM.png"],
+    message: "Thank you so much for your kind wishes! It truly means the world to me. Hope you have an amazing day! ❤️"
+  };
+
+  // ============================================================
+  //  APP LOGIC — no need to edit below this line
+  // ============================================================
+  let curSlide = 0;
+  const LOCK_KEY = 'bday_light_v1';
+
+  const petalColors = ['#e9d5ff','#fbcfe8','#bfdbfe','#fde68a','#fecdd3','#d1fae5'];
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const sz = 8 + Math.random() * 14;
+    p.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      background:${petalColors[Math.floor(Math.random() * petalColors.length)]};
+      left:${Math.random() * 100}%;
+      animation-duration:${6 + Math.random() * 9}s;
+      animation-delay:${Math.random() * 9}s;
+      transform: rotate(${Math.random() * 360}deg);
+    `;
+    document.body.appendChild(p);
+  }
+
+  setTimeout(() => {
+    const intro = document.getElementById('intro');
+    intro.classList.add('out');
+    setTimeout(() => {
+      intro.style.display = 'none';
+      const panel = document.getElementById('mainPanel');
+      panel.style.display = 'block';
+      requestAnimationFrame(() => panel.classList.add('visible'));
+
+      const saved = localStorage.getItem(LOCK_KEY);
+      if (saved) showContent(saved);
+    }, 600);
+  }, 2800);
+
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') revealMessage();
+  });
+
+  function revealMessage() {
+    const val = document.getElementById('nameInput').value.trim();
+    if (!val) {
+      const inp = document.getElementById('nameInput');
+      inp.style.borderColor = '#fca5a5';
+      inp.style.boxShadow = '0 0 0 4px rgba(252,165,165,0.2)';
+      setTimeout(() => { inp.style.borderColor = ''; inp.style.boxShadow = ''; }, 1200);
+      return;
+    }
+    localStorage.setItem(LOCK_KEY, val);
+    showContent(val);
+    burst();
+  }
+
+  function showContent(name) {
+    const key = name.toLowerCase().trim();
+    const data = friendDatabase[key] || { name, ...COMMON };
+    curSlide = 0;
+
+    document.getElementById('displayName').textContent = data.name;
+    document.getElementById('displayMessage').textContent = data.message;
+    document.getElementById('mainPhoto').src = data.photos[0];
+    document.getElementById('photoWrap').dataset.photos = JSON.stringify(data.photos);
+
+    const dots = document.getElementById('pdots');
+    dots.innerHTML = '';
+    if (data.photos.length > 1) {
+      data.photos.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'pdot' + (i === 0 ? ' active' : '');
+        d.onclick = () => goTo(i, data.photos);
+        dots.appendChild(d);
+      });
+    }
+
+    document.getElementById('step1').style.display = 'none';
+    const s2 = document.getElementById('step2');
+    s2.style.display = 'block';
+    s2.style.opacity = '0';
+    s2.style.transform = 'translateY(18px)';
+    s2.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    requestAnimationFrame(() => { s2.style.opacity = '1'; s2.style.transform = 'translateY(0)'; });
+
+    let sx = 0;
+    const wrap = document.getElementById('photoWrap');
+    wrap.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    wrap.addEventListener('touchend', e => {
+      const diff = sx - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) changeSlide(diff > 0 ? 1 : -1);
+    });
+  }
+
+  function goTo(i, photos) {
+    curSlide = i;
+    const img = document.getElementById('mainPhoto');
+    img.style.opacity = '0';
+    setTimeout(() => { img.src = photos[i]; img.style.opacity = '1'; }, 250);
+    document.querySelectorAll('.pdot').forEach((d, j) => d.classList.toggle('active', j === i));
+  }
+
+  function changeSlide(dir) {
+    const p = JSON.parse(document.getElementById('photoWrap').dataset.photos || '[]');
+    goTo(((curSlide + dir) + p.length) % p.length, p);
+  }
+
+  function burst() {
+    const cols = ['#c084fc','#f9a8d4','#93c5fd','#fbbf24','#6ee7b7','#fd7ff8','#fff'];
+    for (let i = 0; i < 60; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.cssText = `
+          left:${10 + Math.random() * 80}%; top:0;
+          background:${cols[Math.floor(Math.random() * cols.length)]};
+          width:${5 + Math.random() * 9}px; height:${5 + Math.random() * 9}px;
+          border-radius:${Math.random() > 0.5 ? '50%' : '3px'};
+          animation-duration:${1.5 + Math.random() * 2}s;
+          animation-delay:${Math.random() * 0.4}s;
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3500);
+      }, i * 18);
+    }
+  }
+</script>
+
+</body>
+</html>
